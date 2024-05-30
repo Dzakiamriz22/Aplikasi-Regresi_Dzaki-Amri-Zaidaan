@@ -26,25 +26,22 @@ def linear_regression(X_train, y_train, X_test):
     y_pred_linear = linear_model.predict(X_test)
     return y_pred_linear
 
-def exponential_regression(X_train, y_train, X_test):
+def power_law_regression(X_train, y_train, X_test):
     # Transformasi data menggunakan log
-    X_train_exp = X_train.copy()
-    X_train_exp['Durasi Waktu Belajar(TB)'] = np.log(X_train_exp['Durasi Waktu Belajar(TB)'] + 1)
-    X_train_exp['Jumlah Latihan Soal(NL)'] = np.log(X_train_exp['Jumlah Latihan Soal(NL)'] + 1)
+    X_train_power = np.log(X_train + 1)
+    X_test_power = np.log(X_test + 1)
+    y_train_power = np.log(y_train + 1)
 
-    X_test_exp = X_test.copy()
-    X_test_exp['Durasi Waktu Belajar(TB)'] = np.log(X_test_exp['Durasi Waktu Belajar(TB)'] + 1)
-    X_test_exp['Jumlah Latihan Soal(NL)'] = np.log(X_test_exp['Jumlah Latihan Soal(NL)'] + 1)
-
-    exp_model = LinearRegression()
-    exp_model.fit(X_train_exp, y_train)
-    y_pred_exp = exp_model.predict(X_test_exp)
-    return y_pred_exp
+    power_model = LinearRegression()
+    power_model.fit(X_train_power, y_train_power)
+    y_pred_power_log = power_model.predict(X_test_power)
+    y_pred_power = np.exp(y_pred_power_log) - 1
+    return y_pred_power
 
 def calculate_rms(y_test, y_pred):
     return np.sqrt(mean_squared_error(y_test, y_pred))
 
-def visualize_results(y_test, y_pred_linear, y_pred_exp):
+def visualize_results(y_test, y_pred_linear, y_pred_power):
     # Visualisasi hasil regresi linear
     plt.figure(figsize=(12, 6))
 
@@ -55,13 +52,13 @@ def visualize_results(y_test, y_pred_linear, y_pred_exp):
     plt.ylabel('Predicted')
     plt.title('Linear Regression')
 
-    # Visualisasi hasil regresi eksponensial
+    # Visualisasi hasil regresi pangkat
     plt.subplot(1, 2, 2)
-    plt.scatter(y_test, y_pred_exp, color='red')
+    plt.scatter(y_test, y_pred_power, color='red')
     plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'k--', lw=2)
     plt.xlabel('Observed')
     plt.ylabel('Predicted')
-    plt.title('Exponential Regression')
+    plt.title('Power Law Regression')
 
     plt.tight_layout()
     plt.show()
